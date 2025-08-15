@@ -21,3 +21,6 @@ class User(Base):
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"
+    
+    def get_roles_to_list(self):
+        return [role.name for role in self.roles]

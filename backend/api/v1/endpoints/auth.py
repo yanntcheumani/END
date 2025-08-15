@@ -28,9 +28,9 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
         db_user = crud_user.create_user(db, user_in)
 
-        return UserOut(id=db_user.id, email=db_user.email, username=db_user.username, role=db_user.roles)
+        return UserOut(id=db_user.id, email=db_user.email, username=db_user.username, role=db_user.get_roles_to_list())
     except HTTPException:
-        raise  # Re-raise HTTPExceptions as-is
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
@@ -53,4 +53,4 @@ def login(username: Annotated[str, Form()], password: Annotated[str, Form()], db
 
 @router.get("/me", response_model=UserOut)
 def get_user(current_user: User = Depends(get_current_user)):
-    return UserOut(id=current_user.id, email=current_user.email, username=current_user.username, role=current_user.roles)
+    return UserOut(id=current_user.id, email=current_user.email, username=current_user.username, role=current_user.get_roles_to_list())

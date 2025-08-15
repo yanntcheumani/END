@@ -1,12 +1,12 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from crud.role import EnumRole
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
     username: str
-    role: Optional[list[EnumRole]] = [EnumRole.USER] 
+    name: str
 
 class UserOut(BaseModel):
     id: int
@@ -14,5 +14,4 @@ class UserOut(BaseModel):
     username: str
     role: list[EnumRole]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
