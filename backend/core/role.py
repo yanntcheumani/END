@@ -7,6 +7,7 @@ from typing import Optional
 from jose import jwt
 
 from core.config import settings
+from db.models.user import User
 
 security = HTTPBearer()
 
@@ -22,7 +23,7 @@ def verify_token(token: str) -> Optional[str]:
     except Exception:
         return None
 
-async def check_user_role(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def check_user_role(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
     db = SessionLocal()
 
     credentials_exception = HTTPException(

@@ -23,6 +23,34 @@ def create_user(db: Session, user_in: UserCreate) -> User:
     db.refresh(db_user)
     return db_user
 
+def create_blogger(db: Session, user_in: UserCreate) -> User:
+    hashed_pw = get_password_hash(user_in.password)
+    db_user = User(email=user_in.email, hashed_password=hashed_pw, username=user_in.username)
+
+    user_role = get_role(db, EnumRole.BLOG)
+
+    if user_role:
+        db_user.roles.append(user_role)
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def create_admin(db: Session, user_in: UserCreate) -> User:
+    hashed_pw = get_password_hash(user_in.password)
+    db_user = User(email=user_in.email, hashed_password=hashed_pw, username=user_in.username)
+
+    user_role = get_role(db, EnumRole.ADMIN)
+
+    if user_role:
+        db_user.roles.append(user_role)
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
 def get_user_by_email(db: Session, email: str) -> User:
     logger.info(f"get_user_by_email - voici le mail que je dois chercher: {email}")
     return db.query(User).filter(User.email == email).first()

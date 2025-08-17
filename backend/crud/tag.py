@@ -5,7 +5,7 @@ from core.logger import get_logger
 
 logger = get_logger(__name__)
 
-def create_tag(db: Session, tag: TagCreate):
+def create_tag(db: Session, tag: TagCreate) -> Tag:
     db_tag = get_tag_by_name(db, tag.name.strip())
     if db_tag:
         logger.info(f"create_tag - voici le tag que j'ai trouvé: {tag}")

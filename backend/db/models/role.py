@@ -10,7 +10,6 @@ user_roles = Table(
     Column('role_id', Integer, ForeignKey('roles.id'))
 )
 
-
 class Role(Base):
     __tablename__ = "roles"
 

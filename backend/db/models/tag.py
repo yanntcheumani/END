@@ -4,12 +4,12 @@ import uuid
 
 from db.base import Base
 
-# blog_taf = Table(
-#     'blog_tag',
-#     Base.metadata,
-#     Column('blog_id', Integer, ForeignKey('users.id')),
-#     Column('blog_id', Integer, ForeignKey('roles.id'))
-# )
+blog_tag = Table(
+    'blog_tag',
+    Base.metadata,
+    Column('blog_id', Integer, ForeignKey('blogs.id')),
+    Column('tags_id', Integer, ForeignKey('tags.id'))
+)
 
 
 class Tag(Base):
@@ -22,7 +22,7 @@ class Tag(Base):
     name = Column(String(255), unique=True, index=True)
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4)
 
-    #users = relationship("User", secondary=user_roles, back_populates="roles")
+    blogs = relationship("Blog", secondary=blog_tag, back_populates="tags")
 
     def __repr__(self):
         return f"Tag<id: {self.id}, name:{self.name}, uuid: {self.uuid}"

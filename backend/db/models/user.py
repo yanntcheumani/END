@@ -18,6 +18,7 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
 
     roles = relationship("Role", secondary=user_roles, back_populates="users")
+    blogs = relationship("Blog", back_populates="author")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, username={self.username})>"

@@ -12,6 +12,7 @@ from schemas.user import UserCreate, UserOut
 from crud import user as crud_user
 from crud.auth import authenticate_user, get_current_user
 from deps import get_db
+from core.role import check_admin_role
 
 router = APIRouter()
 
@@ -27,6 +28,37 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         if db_user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
         db_user = crud_user.create_user(db, user_in)
+
+        return UserOut(id=db_user.id, email=db_user.email, username=db_user.username, role=db_user.get_roles_to_list())
+    except HTTPException:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.post("/create/blogger", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+def register_blogger(user_in: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(check_admin_role)):
+    try:
+        db_user = crud_user.get_user_by_email(db, user_in.email)
+
+        if db_user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        db_user = crud_user.create_blogger(db, user_in)
+
+        return UserOut(id=db_user.id, email=db_user.email, username=db_user.username, role=db_user.get_roles_to_list())
+    except HTTPException:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/create/admin", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+def register_blogger(user_in: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(check_admin_role)):
+    try:
+        db_user = crud_user.get_user_by_email(db, user_in.email)
+
+        if db_user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        db_user = crud_user.create_admin(db, user_in)
 
         return UserOut(id=db_user.id, email=db_user.email, username=db_user.username, role=db_user.get_roles_to_list())
     except HTTPException:
