@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from datetime import timedelta
 
+from core.logger import get_logger
 from core.security import create_access_token
 from core.config import settings
 from db.models.user import User
@@ -12,8 +13,10 @@ from schemas.user import UserCreate, UserOut
 from crud import user as crud_user
 from crud.auth import authenticate_user, get_current_user
 from deps import get_db
-from core.role import check_admin_role
+from core.role import check_admin_role, check_user_role
 
+
+logger = get_logger(__name__)
 router = APIRouter()
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
@@ -23,10 +26,16 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     Create a new user.
     """
     try:
-        db_user = crud_user.get_user_by_email(db, user_in.email)
+        check_if_email_exist = crud_user.get_user_by_email(db, user_in.email)
 
-        if db_user:
+        if check_if_email_exist:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        
+        check_if_email_exist = crud_user.get_user_by_username(db, user_in.username)
+
+        if check_if_email_exist:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already registered")
+        
         db_user = crud_user.create_user(db, user_in)
 
         return UserOut(id=db_user.id, email=db_user.email, username=db_user.username, role=db_user.get_roles_to_list())
@@ -52,7 +61,7 @@ def register_blogger(user_in: UserCreate, db: Session = Depends(get_db), current
 
 
 @router.post("/create/admin", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-def register_blogger(user_in: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(check_admin_role)):
+def register_admin(user_in: UserCreate, db: Session = Depends(get_db), current_user: User = Depends(check_admin_role)):
     try:
         db_user = crud_user.get_user_by_email(db, user_in.email)
 
@@ -84,5 +93,6 @@ def login(username: Annotated[str, Form()], password: Annotated[str, Form()], db
     return {"access_token": access_token, "type": "Bearer"}
 
 @router.get("/me", response_model=UserOut)
-def get_user(current_user: User = Depends(get_current_user)):
+def get_user(current_user: User = Depends(check_user_role)):
+    logger.info(f"voici l'utilisateur que j'ai trouvé: {current_user}")
     return UserOut(id=current_user.id, email=current_user.email, username=current_user.username, role=current_user.get_roles_to_list())

@@ -6,12 +6,13 @@ from core.logger import get_logger
 logger = get_logger(__name__)
 
 def create_tag(db: Session, tag: TagCreate) -> Tag:
+    logger.info(f"create_tag - début de création du tag: {tag.name}")
     db_tag = get_tag_by_name(db, tag.name.strip())
     if db_tag:
         logger.info(f"create_tag - voici le tag que j'ai trouvé: {tag}")
         return db_tag
     
-    db_tag = Tag(name=tag.name)
+    db_tag = Tag(name=tag.name, description=tag.description, color=tag.color)
 
     db.add(db_tag)
     db.commit()
@@ -22,12 +23,12 @@ def create_tag(db: Session, tag: TagCreate) -> Tag:
     return db_tag
 
 def get_tag_by_name(db: Session, name: str) -> Tag:
-    logger.info("recherche du tag")
     dbTag = db.query(Tag).filter(Tag.name == name).first()
     if not dbTag:
         return None
     logger.info(f"tag trouvé: {dbTag}")
 
     return dbTag
-def get_all_tag(db: Session):
+
+def get_all_tag(db: Session) ->  Tag:
     return db.query(Tag).all()

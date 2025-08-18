@@ -3,7 +3,8 @@ from typing import Optional, List
 
 class TagBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, description="nom du tag")
-
+    color: str = Field(..., min_length=2, max_length=255, description="coleur du tag en hexa")
+    description: str = Field(..., min_length=2, max_length=255, description="Description du tag")
 
 class TagCreate(TagBase):
 
@@ -13,6 +14,7 @@ class TagCreate(TagBase):
 
 
 class TagOut(TagBase):
+    id: int
     # reference: str = Field(..., alias="uuid", min_length=1, max_length=255, description="uuid du tag")
 
 

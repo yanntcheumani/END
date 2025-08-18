@@ -21,7 +21,7 @@ class User(Base):
     blogs = relationship("Blog", back_populates="author")
 
     def __repr__(self):
-        return f"<User(id={self.id}, email={self.email}, username={self.username})>"
+        return f"<User(id={self.id}, email={self.email}, username={self.username}, role=[{self.get_roles_to_list()}])>"
     
     def get_roles_to_list(self):
         return [role.name for role in self.roles]

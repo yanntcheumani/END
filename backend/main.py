@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from core.middleware.LoggerMiddleware import LoggingMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from core.logger import setup_logging, get_logger
 
 from api.v1.router import api_v1
@@ -24,6 +25,13 @@ app = FastAPI(title=settings.PROJECT_NAME)
 app.include_router(api_v1, prefix="/api/v1")
 
 app.add_middleware(LoggingMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def initRole():

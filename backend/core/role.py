@@ -23,6 +23,7 @@ def verify_token(token: str) -> Optional[str]:
     except Exception:
         return None
 
+
 async def check_user_role(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
     db = SessionLocal()
 
@@ -32,19 +33,24 @@ async def check_user_role(credentials: HTTPAuthorizationCredentials = Depends(se
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+
     if not credentials:
+        logger.error(f"il n'y a pas de credential")
+        db.close()
         raise credentials_exception
 
     try:
         token = credentials.credentials
         username = verify_token(token)
+        logger.info(f"l'utilisateur: {username}")
+        
 
         current_user = get_user_by_username(db, username)
 
         if not current_user:
-            logger.info(f"lutilisateur: {current_user.username}, n'as pas accès à cette section")
-            raise HTTPException(status_code=403, detail="Not authorized to access this resource")
-        db.close()
+            logger.info(f"l'utilisateur: {username}, n'as pas accès à cette section")
+
+            raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Not authorized to access this resource")
         return current_user
 
     except Exception:

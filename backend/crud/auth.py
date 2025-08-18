@@ -25,6 +25,7 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+    logger.info("je suis entré")
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

@@ -21,6 +21,8 @@ class Tag(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), unique=True, index=True)
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4)
+    color = Column(String(255))
+    description = Column(String(255), default="")
 
     blogs = relationship("Blog", secondary=blog_tag, back_populates="tags")
 

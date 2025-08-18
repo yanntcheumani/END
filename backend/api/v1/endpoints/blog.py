@@ -7,7 +7,7 @@ from typing import List
 from services.blog import BlogService, UPLOAD_DIR
 from db.models.user import User
 from db.models.blog import Blog
-from core.role import check_admin_or_blogger_role, check_user_role
+from core.role import check_admin_or_blogger_role
 from crud.blog import get_blog_by_title, get_all_blog
 from deps import get_db
 from schemas.blog import BlogOut, BlogCreate, BlogFile
